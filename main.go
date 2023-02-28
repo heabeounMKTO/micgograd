@@ -1,13 +1,13 @@
 package main
 
 import (
-	"math/rand"
 	"micgograd/quads"
 	"net/http"
 
 	"github.com/go-echarts/go-echarts/v2/charts"
 	"github.com/go-echarts/go-echarts/v2/opts"
 	"github.com/go-echarts/go-echarts/v2/types"
+	"gonum.org/v1/gonum/floats"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -17,11 +17,9 @@ func main() {
 }
 
 func httpserver(w http.ResponseWriter, _ *http.Request) {
-	data := make([]float64, 49)
-	for i := range data {
-		data[i] = float64(rand.Int31n(20))
-	}
-	a := mat.NewDense(7, 7, data)
+	data := floats.Span(make([]float64, 50), 4000, 300)
+
+	a := mat.NewDense(25, 2, data)
 	x, y := a.Dims()
 	datas := quads.GenerateLineItems(x, y, a)
 	line := charts.NewLine()
@@ -32,8 +30,8 @@ func httpserver(w http.ResponseWriter, _ *http.Request) {
 			Subtitle: "Line chart",
 		}))
 
-	line.SetXAxis([]string{"1", "2", "3", "4", "5", "6"}).
+	line.SetXAxis([]string{}).
 		AddSeries("Number", datas).
-		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: true}))
+		SetSeriesOptions(charts.WithLineChartOpts(opts.LineChart{Smooth: false}))
 	line.Render(w)
 }
